@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Learn CI</title>
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: monospace;
+        }
+        
+        h1 {
+            color: #ddd;
+            font-size: 10vh;
+            text-align: center;
+        }
+        
+        h2 {
+            margin-bottom: 0;
+            color: #ccc;
+            font-size: 5vh;
+            text-align: center;
+        }
+        
+        form {
+            width: 100%;
+            font: inherit;
+            text-align: center;
+        }
+        
+        button {
+            margin-top: 10vh;
+            padding: 1vh 2vh;
+            border: 4px solid #ddd;
+            background: transparent;
+            font: inherit;
+            font-size: 3vh;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        button:hover {
+            background-color: #ddd;
+        }
+        
+        button:focus {
+            outline: 0;
+            background-color: #ccc;
+        }
+        
+        .info {
+            width: 300px;
+            margin: 0 auto;
+        }
+        
+        ol {
+            padding: 0;
+            text-align: center;
+        }
+        
+        li {
+            padding: 2vh;
+            font-size: 3vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Learn CI</h1>
+        <div class="info">
+            <h2>Builds list</h2>
+            <ol>
+                <li>Build 12312341</li>
+                <li>Build 53463263</li>
+                <li>Build 79876967</li>
+            </ol>
+        </div>
+        <form id="form" action="/hello" method="GET">
+            <button id="build">New build</button>
+        </form>
+    </div>
+</body>
+<script>
+    const form = document.getElementById('form');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        form.submit();
+    });
+</script>
+
+</html>
