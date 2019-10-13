@@ -72,6 +72,6 @@ app.post('/build', (req, res) => {
                 finish
             });
         });
-    }, 10000);
+    }, 0);
 
 });

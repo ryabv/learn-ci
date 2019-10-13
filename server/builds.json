@@ -1,1 +1,12 @@
-[]
+[
+    {
+        "id": "1dn32dfdg",
+        "status": "SUCCESS",
+        "command": "npm -v",
+        "stdout": [
+            "6.4.1\n"
+        ],
+        "start": "2019-10-13T17:25:00.867Z",
+        "finish": "2019-10-13T17:25:02.176Z"
+    }
+]
