@@ -9,7 +9,7 @@ const app = express();
 app.listen(serverPort);
 console.log(`Сервер запущен на порту ${serverPort}`);
 
-const agents = new Set();
+let agent = {};
 
 
 app.use(bodyParser.json());
@@ -39,22 +39,32 @@ app.get('/build/:id', (req, res) => {
 
 
 app.get('/build', (req, res) => {
-    const agentsArray = Array.from(agents);
     const buildId = createUniqId();
     const commitHash = req.query.commitHash;
     const command = req.query.command;
 
-    if (!agentsArray.length) {
+    if (!agent.host || !agent.port) {
         res.status(404).send('Ни один агент не зарегистрирован');
     } else {
         request.post({
-                url: `http://localhost:${agentsArray[0].port}/build`,
+                url: `http://${agent.host}:${agent.port}/build`,
                 form: { buildId, commitHash, command, repository }
             },
             (err) => {
                 if (err) throw new Error(`Ошибка соединения с агентом: ${err}`);
-                res.sendStatus(200);
             });
+
+        fs.readFile('builds.json', function(err, content) {
+            if (err) throw err;
+            const parseJson = JSON.parse(content);
+            parseJson.push({ id: buildId, status: 'PENDING' });
+
+            fs.writeFile('builds.json', JSON.stringify(parseJson, null, 4), function(err) {
+                if (err) throw err;
+            })
+        });
+
+        res.redirect('/');
     }
 
 });
@@ -76,25 +86,12 @@ app.get('/', (req, res) => {
 app.get('/notify_agent', (req, res) => {
     const port = req.query.port || '';
     const host = req.query.host || '';
-    const agentInfo = { host, port };
+    agent = { host, port };
 
     if (!port || !host) throw new Error('не задан хост или порт агента');
 
-    agents.add(agentInfo);
-    console.log(`Агент зарегистрирован на сервере! port: ${port}, host: ${host}. \n
-    Список текущих агентов: ${getAgentsList()}`);
+    console.log(`Агент зарегистрирован на сервере! port: ${port}, host: ${host}.`);
     res.sendStatus(200);
-});
-
-// отписать агента, например, 
-// http://localhost:8000/unsubscribe_agent?port=1234&host=localhost
-app.get('/unsubscribe_agent', (req, res) => {
-    const port = req.query.port || 'порт не задан';
-    const host = req.query.host || 'хост не задан';
-    agents.delete(`${host}:${port}`);
-    console.log(`Агент ${host}:${port} удалён с сервера`)
-    console.log(agents.size ? getAgentsList() : 'Список агентов пуст');
-    res.send(`Агент удалён с сервера!`);
 });
 
 // сохранить результаты сборки
@@ -102,7 +99,8 @@ app.post('/notify_build_result', (req, res) => {
 
     fs.readFile('builds.json', function(err, content) {
         if (err) throw err;
-        const parseJson = JSON.parse(content);
+        let parseJson = JSON.parse(content);
+        parseJson = parseJson.filter((build) => { return build.id !== req.body.id });
         parseJson.push(req.body);
 
         fs.writeFile('builds.json', JSON.stringify(parseJson, null, 4), function(err) {
@@ -112,13 +110,6 @@ app.post('/notify_build_result', (req, res) => {
 
     res.sendStatus(200);
 });
-
-
-function getAgentsList() {
-    let agentsList = [];
-    for (agent of agents) agentsList.push(`${agent.host}${agent.port}`);
-    return agentsList.join('\n');
-}
 
 function createUniqId() {
     return new Date().getTime().toString(32);

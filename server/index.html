@@ -77,6 +77,32 @@
             font-size: 3vh;
         }
         
+        a {
+            position: relative;
+        }
+        
+        a::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -2vh;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        a.success::after {
+            background-color: green;
+        }
+        
+        a.pending::after {
+            background-color: orange;
+        }
+        
+        a.failed::after {
+            background-color: red;
+        }
+        
         .container {
             width: 100%;
             max-width: 1440px;
@@ -102,7 +128,7 @@
         <div class="flex">
             <form id="form" action="/build" method="GET">
                 <h2>Create a build</h2>
-                <input type="text" name="commitHash" id="commitHash" placeholder="commit hash">
+                <input type="text" name="commitHash" id="commitHash" placeholder="commit hash" required>
                 <textarea name="command" id="command" cols="30" rows="6" placeholder="command"></textarea>
                 <button id="build">New build</button>
             </form>
@@ -124,17 +150,32 @@
             .then(builds => {
                 const b = JSON.parse(builds);
                 b.forEach(build => {
-                    const li = addLi(build.id, build.id);
+                    const li = addLi(build.id, build.status);
                     buildsList.append(li);
                 })
             });
     }
 
-    function addLi(content, href) {
+    function addLi(name, status) {
+        let statusClass = '';
+        switch (status) {
+            case 'SUCCESS':
+                statusClass = 'success';
+                break;
+            case 'FAILED':
+                statusClass = 'failed';
+                break;
+            case 'PENDING':
+                statusClass = 'pending';
+                break;
+        }
+
         const li = document.createElement('li');
         const a = document.createElement('a');
-        a.href = `build/${href}`;
-        a.innerText = content;
+        a.title = status;
+        a.classList.add(statusClass);
+        a.href = `build/${name}`;
+        a.innerText = name;
 
         li.appendChild(a);
         return li;
