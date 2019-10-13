@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "cd server && node app"
+        "start": "node agent1"
     },
     "author": "",
     "license": "ISC",

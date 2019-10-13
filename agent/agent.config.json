@@ -1,0 +1,5 @@
+{
+    "serverPort": 1234,
+    "repository": "C:\\Users\\Vladimir\\Desktop\\SHRI\\learn-ci",
+    "agentPorts": [1111, 2222, 3333]
+}
