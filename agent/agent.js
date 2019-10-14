@@ -8,6 +8,11 @@ const app = express();
 app.listen(agentPort);
 console.log(`Агент запущен на порту ${agentPort}`);
 
+process.on('SIGINT', () => {
+    request(`http://localhost:${serverPort}/unsubscribe?port=${agentPort}&host=localhost`, () => {
+        process.exit();
+    });
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -50,7 +55,7 @@ app.post('/build', (req, res) => {
             const finish = new Date();
             const status = error.length ? 'FAILED' : 'SUCCESS';
             request.post({
-                url: `http://localhost:${serverPort}/notify_build_result`,
+                url: `http://localhost:${serverPort}/notify_build_result?port=${agentPort}&host=localhost`,
                 form: {
                     id: buildId,
                     status,
